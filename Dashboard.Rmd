@@ -1,0 +1,348 @@
+---
+title: "Who, What, When, and Where are the Data Scientist Jobs?"
+subtitle: "A web scraped report on what it takes"
+output: flexdashboard::flex_dashboard
+---
+
+```{css, echo=FALSE}
+.fluid-row {
+  font-size: 5.9vw;
+}
+```
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(sf)
+library(ggplot2)
+library(openintro)
+library(wordcloud)
+knitr::opts_chunk$set(echo = FALSE, comment = "", warning = FALSE, message = FALSE)
+```
+
+```{r include = FALSE}
+#the nice thing about cleaning your data and saving it is you do not have to put data cleaning in here
+complete_data = read_csv('./data/data_scientist.csv')
+```
+
+
+About the data
+=====================================  
+
+Column {data-width=600}
+-------------------------------------
+
+<h1> **About the data** </h1>
+
+This data was scraped from Dice.com from July 2021 to August 2021. It total, I have captured around 800+ 'Data Science' listings that I web scraped myself using Python. I used a lot of explicit programming rules while defining my word banks to capture things like skills, programming languages, technologies, methodologies, educational level, and years of experience mentioned in each ad. The complete dataset is all technology-related job postings because Dice.com aims to find jobs in a technology-related field. Because this dataset is is only captured over the course of a 30 day time frame from a relatively small job board website, this is merely a small representation on what the common things mentioned in job ads are that were posted on just one website. 
+
+**Captured features**
+
+ - job_listing: Name of the job captured from the title of job listing
+ - original_date_posted: The date the job was originally posted on dice.com
+ - skills: Skills required for the job listed in the header of the job listing 
+ - company: The company posting the job listed in the header of the job listing
+ - job_city: The city where the job is located
+ - job_region: The state where the job is located
+ - job_postal_code: The postal code where the job is located
+ - intext_job_title: The title of the job. Mentioned in the listing text itself
+ - intext_company_name: The name of the company posting the job. Mentioned in the listing text itself
+ - intext_date_posted: The date mentioned when the job was last posted or most recently reposted in the text itself
+ - intext_location: The location where the job is mentioned in the text itself
+ - education_level: The range of education levels mentioned in the job listing itself required for the roll
+ - intext_skills: The skills mentioned in the text itself required for the job
+ - codeing_languages: Programming languages mentioned in the text itself
+ - technologies: The technologies mentioned in the text itself
+ - methodologies: The methodologies mentioned in the text itself
+ - operating_systems: The operating systems mentioned in the text itself
+ - remote: If the job mentions a possibility of remote (or is remote) or not
+ - years_experience: The range of years of experience required for the job, mentioned in the text itself
+ - date_of_processing: The date which I scraped this data from on Dice.com
+ - salary: The salary mentioned in the job listing (never implemented this because it’s too sparse)
+ - URL: The exact URL in which I got the listing from
+
+
+**Snapshot of the dataset**
+
+```{r}
+knitr::kable(complete_data[1:5, c('job_listing','skills', 'years_experience', 'company_name')])
+```
+
+
+**Data Cleaning** 
+
+In order to get the data in a proper form to be tabulated, there was a lot of pre-processing that needed to happen. Mainly, there needed to be scripts writen that would tabulate things like skills, methodologies, ranges for years of experience, etc. However, because I am more fluent in Python than R, I did most of the heavy pre-processing of data in Python using libraries I am more familiar with using like Pandas and Numpy. I did however do some pre-processing in R as well.  
+
+Link to Python code used to pre-process the dataset: https://github.com/dblilienthal/Who-What-When-and-Where-are-the-Data-Scientist-Jobs/blob/main/Pre-processing%20the%20data.ipynb
+
+Column {data-width=400}
+-------------------------------------
+
+<h1> Logical Diagram of my Web Scraper </h1>
+Link to scraper: https://github.com/dblilienthal/Web-Scraping
+
+<img src="Dice Scraping Logical Diagram.png" alt="Logical Diagram of Web Scraper">
+
+
+
+WHO is hiring and WHEN are you ready?
+=====================================  
+
+<h1> **WHO is hiring and WHEN are you ready?** </h1>
+
+There are a few companies who have been actively recruiting 
+    
+Column {data-width=600}
+-------------------------------------
+    
+### **WHO is hiring?**
+    
+There were 357 different companies who posted a job ad for a data scientist role 
+    
+```{r, fig.width=10, fig.height=6}
+complete_data %>%
+  group_by(company_name) %>% 
+  summarise(total_count = n()) %>% 
+  arrange(desc(total_count)) %>% 
+  head(10) %>% 
+  mutate(company_name = fct_reorder(company_name, total_count)) %>% 
+  ggplot(aes(x=total_count, y=company_name, fill=company_name)) +
+  geom_col() +
+  labs(title="Top 10 companies actively recruting Data Scientists", 
+       subtitle = "from July to August 2021",
+       caption = "Source: Dice.com",
+       x = "Number of ads posted") +
+  theme_minimal(base_size = 17) +
+  theme(axis.title.y = element_blank(), 
+        legend.position = "none") +
+  scale_fill_viridis_d(begin = 0.2, end = 0.8)
+```
+
+   
+Column {data-width=400}
+-------------------------------------
+   
+### **WHEN are you ready to be hired?**
+#### These numbers represent a range of years of experience mentioned in each ad
+
+```{r message=FALSE, fig.width=6, fig.height=6}
+YOE <- read_csv('./data/YOE_count.csv')
+YOE <- YOE %>% 
+  rename("YOE" = colnames(YOE)[1])
+YOE %>% 
+  ggplot() +
+  geom_col(aes(x=factor(YOE), y=Occurrence, fill=factor(YOE))) +
+  labs(title="Years of Experience",
+       subtitle = "Mentioned in each ad",
+       x = "Year(s)", 
+       y = "Number of ads", 
+       caption = "Source: Dice.com") +
+  scale_fill_viridis_d(begin = 0.4, end = 0.5) +
+  theme_minimal(base_size = 16) +
+  theme(legend.position = "None", 
+        plot.subtitle = element_text(size=14)) 
+```
+  
+
+
+WHAT do you need to know? 
+=====================================     
+
+<h1> **WHAT do you need to know?** </h1>
+
+Aside from knowledge of statistics and general programming, there is a lot of skills not often talked about that are vital to know in order to be a Data Scientist.
+   
+   
+Column {data-width=500}
+-------------------------------------
+
+### **150 different skills mentioned**
+
+```{r Word cloud, fig.width=4, fig.height=4}
+skills_metioned <- read_csv('./data/skills1.csv')
+skills_metioned <- skills_metioned %>% 
+  rename("skills" = colnames(skills_metioned)[1]) %>% 
+  filter(skills != "nan") %>% 
+  head(150)
+
+a <- skills_metioned %>% pull(skills)
+b <- skills_metioned %>% pull(Occurrence)
+
+wordcloud(a , b , col=brewer.pal(8,"Dark2") , random.order=FALSE)
+```
+
+
+Column {data-width=500}
+-------------------------------------
+   
+### **Programming Languages that are common**
+
+```{r fig.width=12, fig.height=5}
+p_langs <- read_csv('./data/programming_languages_count.csv')
+p_langs <- p_langs %>% 
+  rename("P_langs" = "...1") %>% 
+  filter(P_langs != 'processing') # Processing is not actually a common programming language as a data scientist
+
+
+p_langs %>%
+  mutate(prop = Occurrence / dim(complete_data)[1]) %>% # Get the percentage of total job listings that mention it
+  mutate(P_langs = str_to_title(P_langs)) %>% # Captialize each language
+  arrange(desc(prop)) %>% # Greatest to least 
+  head(5) %>% # Top 5
+  ggplot(aes(y=prop, x=reorder(P_langs, -prop), label=P_langs, fill=P_langs)) + 
+  geom_bar(stat = "identity") + # Bar plot
+  geom_text(stat = "summary", fun.y = sum, vjust=-1, size=8) + # 
+  scale_y_continuous(labels = scales::percent, # Convert to percentages
+                     limits = c(0,1)) + # show all 100% percent
+  theme_light(base_size = 22) +
+  theme(axis.text.x = element_blank(), 
+        axis.title.x = element_blank(),
+        axis.text.y = element_text(), 
+        legend.position = "None") +
+  labs(title="Top 5 programming languages mentioned", 
+       y = "Percentage of ads", 
+       caption = "Source: Dice.com") +
+  scale_fill_viridis_d(begin = 0.6, end = 0.7)
+
+```   
+    
+### **Methodologies you might need to know**
+
+```{r fig.width=14, fig.height=5}
+methods <- read_csv('./data/methods_count.csv')
+methods %>% 
+  rename("Methodology" = "...1") %>% 
+  filter(Methodology != "nan") %>% 
+  mutate_all(funs(str_replace(., "version", "version control"))) %>% 
+  filter(Methodology != "control", ### Filtering out redudant words that are captured in other words
+         Methodology != "integration", 
+         Methodology != "continuous", 
+         Methodology != "development", 
+         Methodology != "github", 
+         Methodology != "d3") %>% 
+  mutate_all(funs(str_replace(., "incremental", "incremental development"))) %>% 
+  mutate(Occurrence = as.integer(Occurrence)) %>% 
+  mutate(Methodology = fct_reorder(Methodology, Occurrence)) %>% 
+  head(10) %>% 
+  ggplot(aes(y=Methodology, x=Occurrence)) +
+  geom_col(width = 0.1) +
+  geom_point(aes(size=13, color=Methodology)) +
+  theme_minimal(base_size = 18) +
+  theme(axis.title.y = element_blank(), 
+        legend.position = "None", 
+        axis.text.y = element_text(size=22), 
+        plot.title = element_text(size=24)) +
+  labs(title="Top 10 frequently referenced methodologies", 
+       x = "Number of occurences" ,
+       caption = "Source: Dice.com") +
+  scale_color_viridis_d(begin = 0.8, end = 0.9)
+```
+
+
+WHERE are the jobs?
+=====================================  
+
+<h1> **WHERE are all the jobs?** </h1>
+
+Even though many of the jobs are located in major metropolitan areas, a significant portion are offered remotely.
+
+
+Row {data-height=500}
+-------------------------------------
+   
+### **Cities with the most ads**
+
+
+```{r country map jobs, fig.width=15, fig.height=6}
+
+complete_data %>%
+  drop_na(job_city) %>% 
+  group_by(job_city) %>% 
+  summarise(total_count = n()) %>% 
+  arrange(desc(total_count)) %>% 
+  head(20) %>% 
+  mutate(job_city = fct_reorder(job_city, total_count)) %>% 
+  ggplot(aes(y=total_count, x=job_city, fill=job_city)) +
+  geom_col(width = 0.2) +
+  geom_point(size=10, shape=17) +
+  theme_minimal(base_size = 18) +
+  theme(axis.text.x = element_text(angle = 45, hjust=0.9, size=22), 
+        axis.title.x = element_blank(), 
+        legend.position = "none", 
+        plot.title = element_text(size=25)) +
+  labs(title="Top 20 cities posting Data Science job ads", 
+       y = "Number of ads", 
+       x = "Cities") +
+  ylim(0, 30) +
+  scale_fill_viridis_d(begin = 0.4, end = 0.7)
+```
+    
+
+### **Looking at where the jobs are geographically**
+
+```{r remote graph, fig.width=15, fig.height=5}
+### Read in the US SF data 
+us_states <- read_sf("./data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.shp")
+
+### Filter out Alaska, Hawaii, and Puerto Rico
+lower_48 <- us_states %>% 
+  filter(!(NAME %in% c("Alaska", "Hawaii", "Puerto Rico")))
+
+### Tabulating by states
+complete_data %>%
+  group_by(job_region) %>% 
+  summarise(total_count = n()) -> state_tabulation
+
+### Join both data together
+lower_48 %>% 
+  st_transform(5070) %>% 
+  left_join(state_tabulation, by = c("STUSPS" = "job_region")) -> geo_data_1
+
+### Geospacial Map
+geo_data_1 %>% 
+  mutate(total_count = as.integer(total_count)) %>% 
+  ggplot() + 
+    geom_sf(aes(geometry = geometry, fill = total_count)) +
+  labs(title="States with the most amount of Data Science jobs", 
+       caption = "Grey states have no entries in my dataset", 
+       fill = "Number of ads") +
+  coord_sf(crs = 4269) +  # NAD83
+  theme_void(base_size = 18) + 
+  theme(legend.position = "right") +
+  scale_fill_viridis_c(begin = 0.4, end = 0.7)
+  
+  
+```   
+
+
+Row {data-height=500}
+-------------------------------------
+
+### **Jobs listed as offered remotely**
+
+```{r fig.width=10, fig.height=5}
+temp <- complete_data %>% 
+  group_by(remote) %>% 
+  summarise(total_count = n()) %>% 
+  mutate(prop = total_count / sum(total_count), 
+         Number = total_count) %>% 
+  ggplot(aes(x="", y=remote, fill=Number, color=remote)) + 
+  geom_count(aes(size=prop)) +
+  scale_size(range = c(20,60)) +
+  labs(title="\nData Science Jobs") +
+  theme_void() +
+  theme(legend.position = "none", 
+        plot.title = element_text(hjust = 0.5,  size=35)) +
+  scale_color_viridis_d(begin = 0.2, end = 0.8) +
+  annotate(geom="text", x=0.6, y=1, label="Remote", color="black", size=6) +
+  annotate(geom="text", x=0.7, y=2, label="Not Remote", color="black", size=6) + 
+  annotate(geom="text", x=0.77, y=0, label="Not Remote", color="white", size=7)
+  
+ggplotly(temp, tooltip="Number") %>% 
+  layout(hoverlabel = list(font=list(size=20)))
+```
+
+
+
+
