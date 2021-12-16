@@ -130,7 +130,7 @@ Column {data-width=400}
 ### **WHEN are you ready to be hired?**
 #### These numbers represent a range of years of experience mentioned in each ad
 
-```{r message=FALSE, fig.width=6, fig.height=6}
+```{r message=FALSE, fig.width=8, fig.height=8}
 YOE <- read_csv('./data/YOE_count.csv')
 YOE <- YOE %>% 
   rename("YOE" = colnames(YOE)[1])
@@ -339,8 +339,8 @@ temp <- complete_data %>%
   theme(legend.position = "none", 
         plot.title = element_text(hjust = 0.5,  size=35)) +
   scale_color_viridis_d(begin = 0.2, end = 0.8) +
-  annotate(geom="text", x=0.6, y=1, label="Remote", color="black", size=6) +
-  annotate(geom="text", x=0.7, y=2, label="Not Remote", color="black", size=6) + 
+  annotate(geom="text", x=0.6, y=1, label="Not Remote", color="black", size=6) +
+  annotate(geom="text", x=0.77, y=2, label="Remote", color="black", size=6) + 
   annotate(geom="text", x=0.77, y=0, label="Not Remote", color="white", size=7)
   
 ggplotly(temp, tooltip="Number") %>% 
