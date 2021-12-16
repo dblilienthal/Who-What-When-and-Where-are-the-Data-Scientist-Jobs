@@ -7,5 +7,4 @@ Link to whole dashboard: https://who-what-when-and-where-are-the-data-scientist-
 
 <img src='Dashboard WHO WHEN.png'>
 
-<img src='Dashboard WHERE.png'>
 
