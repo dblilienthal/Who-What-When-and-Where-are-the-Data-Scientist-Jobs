@@ -3,4 +3,9 @@ This repository contains an HTML dashboard to tell a story about WHO is hiring, 
 
 Link to whole dashboard: https://who-what-when-and-where-are-the-data-scientist-jobs.dereklilientha1.repl.co/
 
+<img src='Dashboard WHO WHEN.png'>
+
 <img src='Dashboard Demo.png'>
+
+
+<img src='Dashboard WHERE.png'>
