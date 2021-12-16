@@ -26,6 +26,7 @@ knitr::opts_chunk$set(echo = FALSE, comment = "", warning = FALSE, message = FAL
 complete_data = read_csv('./data/data_scientist.csv')
 ```
 
+*By Derek Lilienthal*
 
 About the data
 =====================================  
@@ -75,6 +76,9 @@ knitr::kable(complete_data[1:5, c('job_listing','skills', 'years_experience', 'c
 In order to get the data in a proper form to be tabulated, there was a lot of pre-processing that needed to happen. Mainly, there needed to be scripts writen that would tabulate things like skills, methodologies, ranges for years of experience, etc. However, because I am more fluent in Python than R, I did most of the heavy pre-processing of data in Python using libraries I am more familiar with using like Pandas and Numpy. I did however do some pre-processing in R as well.  
 
 Link to Python code used to pre-process the dataset: https://github.com/dblilienthal/Who-What-When-and-Where-are-the-Data-Scientist-Jobs/blob/main/Pre-processing%20the%20data.ipynb
+
+Link to dashboard source code:
+https://github.com/dblilienthal/Who-What-When-and-Where-are-the-Data-Scientist-Jobs
 
 Column {data-width=400}
 -------------------------------------
